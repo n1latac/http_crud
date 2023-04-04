@@ -1,4 +1,4 @@
-const {Thing} = require('../models/Thing');
+const {Thing} = require('../models');
 
 module.exports.createThing = async (req,res,next) => {
     const {body} = req;
@@ -9,6 +9,15 @@ module.exports.createThing = async (req,res,next) => {
         }else{
             return res.status(400).send();
         }
+    }catch(error){
+        next(error);
+    }
+}
+
+module.exports.getAllThings = async (req, res, next) =>{
+    try{
+        const things = await Thing.findAllThings();
+        return res.status(201).send(things);
     }catch(error){
         next(error);
     }

@@ -3,27 +3,30 @@ class Thing{
     static _client = null;
     static name = 'Thing'
 
-    static _atributes={
+    static _attributes={
         body: 'string'
     }
 
 
-    static async create(insertValues){
-        const insertAttr = Object.entries(this._atributes)
-        .filter(([attr,domain])=> attr in insertValues)
-        .map(([attr])=> attr);
+    static async create(insertValues) {
+        console.log(this._client);
 
-        const insertSchemaStr = insertAttr.map((attr)=>`"${attr}"`).join(',');
+        const insertAttr = Object.entries(this._attributes)
+         .filter(([attr, domain])=> attr in insertValues)
+         .map(([attr]) => attr);
+         console.log(insertAttr);
+ 
+         const insertSchemaStr = insertAttr.map(attr => `"${attr}"`).join(',');
 
-        const insertValueString = insertAttr.map(attr => {
-            const value = insertValues[attr];
+         const insertValueStr = insertAttr.map(attr => {
+             const value = insertValues[attr];
             return typeof value === 'string' ? `'${value}'` : value;
-        }).join(',');
-        const str = `INSERT INTO ${this._tableName} (${insertSchemaStr})
-            VALUES (${insertValueString}) RETURNING *;`
-        const {rows} = await this._client.query(str);
-        return rows;
-    }
+         }).join(',');
+         const str = `INSERT INTO ${this._tableName} (${insertSchemaStr})
+                             VALUES (${insertValueStr}) RETURNING *;`
+         const {rows} = await this._client.query(str);
+         return rows;
+     }
 
 
     static async updateByPk (updateObj){
@@ -44,6 +47,11 @@ class Thing{
         return rows; 
     }
 
+
+    static async findAllThings(){
+        const {rows} = await this._client.query(`SELECT * FROM ${this._tableName}`);
+        return rows;
+    }
     static async findByPk(Pk){
         const {rows} = await this._client.query(`SELECT * FROM ${THIS._tableName} WHERE id = ${Pk};`);
         return rows
@@ -57,3 +65,4 @@ class Thing{
     }
     
 }
+module.exports = Thing;
