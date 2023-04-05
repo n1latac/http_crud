@@ -9,7 +9,6 @@ class Thing{
 
 
     static async create(insertValues) {
-        console.log(this._client);
 
         const insertAttr = Object.entries(this._attributes)
          .filter(([attr, domain])=> attr in insertValues)
@@ -31,18 +30,21 @@ class Thing{
 
     static async updateByPk (updateObj){
         const {id,updateValues} = updateObj;
-        const insertAttr = Object.entries(this._atributes)
-        .filter(([attr,domain])=> attr in updateValues)
+        
+        const insertAttr = Object.entries(updateValues)
+        .filter(([attr,domain])=> attr in this._attributes)
         .map(([attr])=> attr);
+        console.log(insertAttr);
 
 
         const insertValueString = insertAttr.map(attr => {
-            const value = updateObj[attr];
+            const value = updateValues[attr];
             return `${attr} = ${typeof value === 'string' ? `'${value}'` : value}`
         }).join(',');
-        const {rows} = `UPDATE ${this._tableName}
+        const {rows} = await this._client.query( `UPDATE ${this._tableName}
                         SET ${insertValueString}
-                        WHERE id = ${id};`
+                        WHERE id = ${id};`);
+
 
         return rows; 
     }
@@ -63,6 +65,17 @@ class Thing{
                                             WHERE id = ${pk};`)
         return rows
     }
+    static async getOneThingById(id){
+        const {rows} = await this._client.query(`SELECT * FROM ${this._tableName}
+                                                    WHERE id = ${id};`);
+        return rows 
+    }
     
+    static async deleteOneThingById(id){
+        const {rows} = await this._client.query(`DELETE FROM ${this._tableName}
+                                                    WHERE id = ${id};`);
+        return rows;
+    }
+
 }
 module.exports = Thing;
