@@ -6,8 +6,9 @@ const ThingSchema = yup.object().shape({
 
 
 module.exports.validateThing = async (req,res,next) => {
+    const {body} = req;
     try{
-        const validated = await ThingSchema.validate(req.body);
+        const validated = await ThingSchema.validate(body);
         if(validated){
             return next()
         } 
